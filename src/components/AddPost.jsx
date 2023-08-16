@@ -1,18 +1,26 @@
 import { nanoid } from 'nanoid';
 import React from 'react';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { addPost } from 'redux/postsSlice';
+import { selectPosts } from 'redux/selectors';
 
 export const AddPost = () => {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
+  const posts = useSelector(selectPosts);
   const dispatch = useDispatch();
   const handleSubmit = e => {
     e.preventDefault();
     if (!title || !body) {
+      // проверка что не записали ниче в инпут
       toast.error('Write your post!');
+      return;
+    }
+    const existedPost = posts.find(post => post.title === title);
+    if (existedPost) {
+      toast.error(`Post with this value: ${title}, already exist`);
       return;
     }
     const newPost = {
